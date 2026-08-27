@@ -1,0 +1,423 @@
+# Microfinance Loan System Endpoints
+
+## AuthController (/api/auth)
+* POST /api/auth/register
+  * Expected Body: `User`
+  * Expected Response: `User`
+* POST /api/auth/login
+  * Expected Body: `LoginRequest`
+  * Expected Response: `LoginResponse`
+* POST /api/auth/logout
+  * Expected Body: None
+  * Expected Response: `String`
+* POST /api/auth/verify-email-otp
+  * Expected Body: `OtpVerificationRequest`
+  * Expected Response: `String`
+* POST /api/auth/verify-2fa
+  * Expected Body: `TwoFactorVerificationRequest`
+  * Expected Response: `LoginResponse`
+* POST /api/auth/sso-login
+  * Expected Body: `SsoLoginRequest`
+  * Expected Response: `LoginResponse`
+* POST /api/auth/verify-device
+  * Expected Body: `DeviceVerificationRequest`
+  * Expected Response: `LoginResponse`
+* POST /api/auth/forgot-password
+  * Expected Body: `ForgotPasswordRequest`
+  * Expected Response: `String`
+* POST /api/auth/reset-password
+  * Expected Body: `PasswordResetRequest`
+  * Expected Response: `String`
+* POST /api/auth/switch-role
+  * Expected Body: `RoleSwitchRequest`
+  * Expected Response: `LoginResponse`
+
+## MobileOperationsController (/api/mobile)
+* POST /api/mobile/attendance/check-in
+  * Expected Body: None (Uses Request Parameters)
+  * Expected Response: `FieldVisit`
+* POST /api/mobile/agreement/sign
+  * Expected Body: `SignAgreementRequest`
+  * Expected Response: `LoanApplication`
+* GET /api/mobile/route/optimize
+  * Expected Body: None (Uses Request Parameters)
+  * Expected Response: `List<Map<String, Object>>`
+* POST /api/mobile/photo-doc
+  * Expected Body: None (Uses Request Parameters)
+  * Expected Response: `PhotoCollateral`
+* POST /api/mobile/field-note
+  * Expected Body: `FieldNoteRequest`
+  * Expected Response: `Map<String, String>`
+* GET /api/mobile/sync-dashboard
+  * Expected Body: None (Uses Request Parameters)
+  * Expected Response: `Map<String, Object>`
+* POST /api/mobile/security/failed-unlock
+  * Expected Body: None (Uses Request Parameters)
+  * Expected Response: `Map<String, Object>`
+* GET /api/mobile/scorecard
+  * Expected Body: None (Uses Request Parameters)
+  * Expected Response: `Map<String, Object>`
+
+## UserController (/api/users)
+* GET /api/users/profile
+  * Expected Body: None
+  * Expected Response: `User`
+* PUT /api/users/profile
+  * Expected Body: `ProfileUpdateRequest`
+  * Expected Response: `User`
+* PUT /api/users/{id}/approve
+  * Expected Body: None
+  * Expected Response: `User`
+* GET /api/users/audit-logs
+  * Expected Body: None
+  * Expected Response: `List<AuditLog>`
+* PUT /api/users/{id}/unlock
+  * Expected Body: None
+  * Expected Response: `User`
+* POST /api/users/profile/report-breach
+  * Expected Body: None
+  * Expected Response: `String`
+* POST /api/users/{id}/report-breach
+  * Expected Body: None
+  * Expected Response: `String`
+* POST /api/users/profile/emergency-override
+  * Expected Body: None (Uses Request Parameters)
+  * Expected Response: `User`
+
+## PortfolioAnalyticsController (/api/portfolio)
+* GET /api/portfolio/par-segmented
+  * Expected Body: None
+  * Expected Response: `Map<String, Object>`
+* GET /api/portfolio/vintage
+  * Expected Body: None
+  * Expected Response: `List<Map<String, Object>>`
+* GET /api/portfolio/collection-efficiency
+  * Expected Body: None
+  * Expected Response: `Map<String, Object>`
+* GET /api/portfolio/yield-cost
+  * Expected Body: None
+  * Expected Response: `Map<String, Object>`
+* GET /api/portfolio/officers-productivity
+  * Expected Body: None
+  * Expected Response: `List<Map<String, Object>>`
+* GET /api/portfolio/delinquency-heatmap
+  * Expected Body: None
+  * Expected Response: `List<Map<String, Object>>`
+* GET /api/portfolio/product-profitability
+  * Expected Body: None
+  * Expected Response: `List<Map<String, Object>>`
+* GET /api/portfolio/clv
+  * Expected Body: None
+  * Expected Response: `List<Map<String, Object>>`
+* GET /api/portfolio/early-warning
+  * Expected Body: None
+  * Expected Response: `List<Map<String, Object>>`
+* GET /api/portfolio/mis-report
+  * Expected Body: None
+  * Expected Response: `String`
+
+## RegulatoryComplianceController (/api/compliance)
+* GET /api/compliance/cibil-export
+  * Expected Body: None
+  * Expected Response: `String`
+* GET /api/compliance/rbi-export
+  * Expected Body: None
+  * Expected Response: `String`
+* GET /api/compliance/mfin-report
+  * Expected Body: None
+  * Expected Response: `Map<String, Object>`
+* GET /api/compliance/agreement/{loanId}
+  * Expected Body: None
+  * Expected Response: `String`
+* GET /api/compliance/kyc-reminders
+  * Expected Body: None
+  * Expected Response: `List<Client>`
+* GET /api/compliance/branch-report
+  * Expected Body: None (Uses Request Parameters)
+  * Expected Response: `Map<String, Object>`
+* GET /api/compliance/stress-test
+  * Expected Body: None (Uses Request Parameters)
+  * Expected Response: `Map<String, Object>`
+* GET /api/compliance/alerts
+  * Expected Body: None
+  * Expected Response: `List<ComplianceCalendar>`
+
+## SystemAdminController (/api/admin)
+* POST /api/admin/users/{id}/lifecycle
+  * Expected Body: None (Uses Request Parameters)
+  * Expected Response: `User`
+* POST /api/admin/config
+  * Expected Body: None (Uses Request Parameters)
+  * Expected Response: `SystemConfig`
+* GET /api/admin/dashboard
+  * Expected Body: None
+  * Expected Response: `Map<String, Object>`
+* POST /api/admin/bulk-import/clients
+  * Expected Body: `String` (CSV Payload)
+  * Expected Response: `Map<String, Object>`
+* GET /api/admin/health
+  * Expected Body: None
+  * Expected Response: `Map<String, Object>`
+* GET /api/admin/audit-logs/search
+  * Expected Body: None (Uses Request Parameters)
+  * Expected Response: `List<SecurityAuditLog>`
+* GET /api/admin/integrations
+  * Expected Body: None
+  * Expected Response: `Map<String, Object>`
+* GET /api/admin/template
+  * Expected Body: None (Uses Request Parameters)
+  * Expected Response: `Map<String, String>`
+
+## LoanController (/api)
+* POST /api/loans/apply
+  * Expected Body: `LoanApplication`
+  * Expected Response: `LoanApplication`
+* GET /api/loans/{id}
+  * Expected Body: None
+  * Expected Response: `Map<String, Object>`
+* PUT /api/loans/{id}/approve
+  * Expected Body: None
+  * Expected Response: `LoanApplication`
+* POST /api/loans/{id}/disburse
+  * Expected Body: None (Uses Request Parameters)
+  * Expected Response: `Map<String, Object>`
+* GET /api/loans/client/{id}
+  * Expected Body: None
+  * Expected Response: `List<LoanApplication>`
+* GET /api/emi/schedule/{loanId}
+  * Expected Body: None
+  * Expected Response: `List<EMISchedule>`
+* POST /api/collections
+  * Expected Body: `CollectionRequest`
+  * Expected Response: `Collection`
+* GET /api/collections/overdue
+  * Expected Body: None
+  * Expected Response: `List<EMISchedule>`
+* GET /api/emi/receipt/{id}
+  * Expected Body: None
+  * Expected Response: `Map<String, Object>`
+* GET /api/portfolio/par
+  * Expected Body: None
+  * Expected Response: `Map<String, Object>`
+* PUT /api/loans/{id}/reject
+  * Expected Body: `LoanRejectionRequest`
+  * Expected Response: `LoanApplication`
+* GET /api/loans/{id}/timeline
+  * Expected Body: None
+  * Expected Response: `List<LoanTimeline>`
+* GET /api/loans/{id}/rejection-letter
+  * Expected Body: None
+  * Expected Response: `Map<String, String>`
+* POST /api/loans/{id}/committee-signoff
+  * Expected Body: `CommitteeSignOffRequest`
+  * Expected Response: `Map<String, Object>`
+* GET /api/loans/{id}/deliberations
+  * Expected Body: None
+  * Expected Response: `CreditCommitteeDeliberation`
+* POST /api/loans/{id}/disbursement/prepare
+  * Expected Body: None
+  * Expected Response: `LoanApplication`
+* POST /api/loans/{id}/disbursement/approve
+  * Expected Body: None
+  * Expected Response: `LoanApplication`
+* POST /api/loans/{id}/utilization
+  * Expected Body: None (Uses Request Parameters)
+  * Expected Response: `LoanApplication`
+* POST /api/loans/{id}/restructure
+  * Expected Body: `RestructuringRequest`
+  * Expected Response: `LoanApplication`
+
+## NotificationController (/api/notifications)
+* POST /api/notifications/trigger-daily
+  * Expected Body: None
+  * Expected Response: `Map<String, Object>`
+* POST /api/notifications/agent-targets
+  * Expected Body: None (Uses Request Parameters)
+  * Expected Response: `Map<String, Object>`
+* POST /api/notifications/broadcast
+  * Expected Body: `BroadcastRequest`
+  * Expected Response: `Map<String, Object>`
+* GET /api/notifications/logs
+  * Expected Body: None
+  * Expected Response: `List<NotificationLog>`
+
+## GroupLendingController (/api/groups)
+* POST /api/groups/create
+  * Expected Body: `List<Long>`
+  * Expected Response: `Group`
+* POST /api/groups/{id}/grt/schedule
+  * Expected Body: None (Uses Request Parameters)
+  * Expected Response: `Group`
+* POST /api/groups/{id}/grt/pass
+  * Expected Body: `GrtPassRequest`
+  * Expected Response: `Group`
+* POST /api/groups/{id}/training/attend
+  * Expected Body: None
+  * Expected Response: `Group`
+* GET /api/groups/{id}/liability-health
+  * Expected Body: None
+  * Expected Response: `Map<String, Object>`
+* POST /api/groups/savings/deposit
+  * Expected Body: `GroupSavingsDepositRequest`
+  * Expected Response: `List<GroupSavingsRecord>`
+* POST /api/groups/member/add
+  * Expected Body: None (Uses Request Parameters)
+  * Expected Response: `Client`
+* POST /api/groups/member/exit
+  * Expected Body: `MemberExitRequest`
+  * Expected Response: `Client`
+* POST /api/groups/meetings/record
+  * Expected Body: `GroupMeetingRequest`
+  * Expected Response: `GroupMeeting`
+* GET /api/groups/graduation-status/{clientId}
+  * Expected Body: None
+  * Expected Response: `Map<String, Object>`
+
+## InfoController (/api)
+* GET /api/info
+  * Expected Body: None
+  * Expected Response: `Map<String, Object>`
+
+## ExceptionAnalyticsController (/api/admin)
+* GET /api/admin/exception-analytics
+  * Expected Body: None
+  * Expected Response: `Map<String, Object>`
+
+## DelinquencyController (/api/delinquency)
+* POST /api/delinquency/daily-cron
+  * Expected Body: None
+  * Expected Response: `Map<String, Object>`
+* GET /api/delinquency/write-off/recommendations
+  * Expected Body: None
+  * Expected Response: `List<WriteOffRecommendationResponse>`
+* POST /api/delinquency/write-off/{id}
+  * Expected Body: None
+  * Expected Response: `LoanApplication`
+* POST /api/delinquency/write-off/{id}/recovery
+  * Expected Body: None (Uses Request Parameters)
+  * Expected Response: `LoanApplication`
+* POST /api/delinquency/legal-action
+  * Expected Body: `LegalActionRequest`
+  * Expected Response: `LoanApplication`
+* GET /api/delinquency/npa-movement
+  * Expected Body: None
+  * Expected Response: `Map<String, Object>`
+* POST /api/delinquency/ots/propose
+  * Expected Body: `OtsProposalRequest`
+  * Expected Response: `LoanApplication`
+* POST /api/delinquency/ots/{id}/approve
+  * Expected Body: None
+  * Expected Response: `LoanApplication`
+
+## ClientController (/api)
+* POST /api/clients
+  * Expected Body: `ClientRegistrationRequest`
+  * Expected Response: `Client`
+* GET /api/clients/{id}
+  * Expected Body: None
+  * Expected Response: `Client`
+* POST /api/kyc/verify
+  * Expected Body: `KycRequest`
+  * Expected Response: `Map<String, Object>`
+* POST /api/cibil/enquiry
+  * Expected Body: `CibilRequest`
+  * Expected Response: `Map<String, Object>`
+* GET /api/groups/{id}
+  * Expected Body: None
+  * Expected Response: `Map<String, Object>`
+* POST /api/clients/{id}/verify-income
+  * Expected Body: `IncomeVerificationRequest`
+  * Expected Response: `Client`
+* POST /api/clients/{id}/assess-credit
+  * Expected Body: None
+  * Expected Response: `Client`
+* PUT /api/clients/{id}/override-score
+  * Expected Body: `ScoreOverrideRequest`
+  * Expected Response: `Client`
+* GET /api/clients/{id}/credit-report
+  * Expected Body: None
+  * Expected Response: `Map<String, String>`
+
+## CollectionController (/api/collections)
+* POST /api/collections/record
+  * Expected Body: `CollectionRequest`
+  * Expected Response: `Collection`
+* POST /api/collections/sync
+  * Expected Body: `OfflineSyncRequest`
+  * Expected Response: `List<Collection>`
+* POST /api/collections/group-payment
+  * Expected Body: `GroupCollectionRequest`
+  * Expected Response: `List<Collection>`
+* POST /api/collections/reconcile
+  * Expected Body: `ReconciliationRequest`
+  * Expected Response: `Map<String, Object>`
+* GET /api/collections/calendar
+  * Expected Body: None (Uses Request Parameters)
+  * Expected Response: `List<Map<String, Object>>`
+* POST /api/collections/overdue-escalation
+  * Expected Body: None
+  * Expected Response: `List<Map<String, Object>>`
+* GET /api/collections/dashboard
+  * Expected Body: None
+  * Expected Response: `Map<String, Object>`
+* POST /api/collections/waiver/request
+  * Expected Body: `WaiverApplicationRequest`
+  * Expected Response: `WaiverRequest`
+* POST /api/collections/waiver/{id}/approve
+  * Expected Body: None
+  * Expected Response: `WaiverRequest`
+* GET /api/collections/receipt/{id}
+  * Expected Body: None
+  * Expected Response: `Map<String, Object>`
+
+## AdvancedAnalyticsController (/api/analytics)
+* GET /api/analytics/custom-report
+  * Expected Body: None (Uses Request Parameters)
+  * Expected Response: `Map<String, Object>`
+* GET /api/analytics/export
+  * Expected Body: None (Uses Request Parameters)
+  * Expected Response: `String`
+* GET /api/analytics/anomalies
+  * Expected Body: None
+  * Expected Response: `List<Map<String, Object>>`
+* GET /api/analytics/forecast
+  * Expected Body: None
+  * Expected Response: `Map<String, Object>`
+* GET /api/analytics/benchmarks
+  * Expected Body: None
+  * Expected Response: `Map<String, Object>`
+* GET /api/analytics/bottlenecks
+  * Expected Body: None
+  * Expected Response: `List<Map<String, Object>>`
+* GET /api/analytics/weekly-insights
+  * Expected Body: None
+  * Expected Response: `String`
+* GET /api/analytics/risk-ranking
+  * Expected Body: None
+  * Expected Response: `List<Map<String, Object>>`
+* GET /api/analytics/strategic
+  * Expected Body: None
+  * Expected Response: `Map<String, Object>`
+
+## DataSecurityController (/api/security)
+* POST /api/security/audit-log
+  * Expected Body: `AuditLogRequest`
+  * Expected Response: `SecurityAuditLog`
+* GET /api/security/check-intrusion
+  * Expected Body: None (Uses Request Parameters)
+  * Expected Response: `Map<String, Object>`
+* POST /api/security/sanitize
+  * Expected Body: None (Uses Request Parameters)
+  * Expected Response: `Map<String, String>`
+* POST /api/security/retention/run
+  * Expected Body: None
+  * Expected Response: `Map<String, Object>`
+* POST /api/security/backup
+  * Expected Body: None
+  * Expected Response: `Map<String, Object>`
+* POST /api/security/scan
+  * Expected Body: None
+  * Expected Response: `Map<String, Object>`
+* GET /api/security/compliance-package
+  * Expected Body: None
+  * Expected Response: `Map<String, Object>`

@@ -1,0 +1,219 @@
+{
+  "info": {
+    "name": "Microfinance Loan System API",
+    "description": "Auto-generated Postman Collection for the Microfinance Loan System.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Advanced Analytics",
+      "item": [
+         { "name": "GET /custom-report", "request": { "method": "GET", "url": "http://localhost:8080/api/analytics/custom-report" } },
+         { "name": "GET /export", "request": { "method": "GET", "url": "http://localhost:8080/api/analytics/export" } },
+         { "name": "GET /anomalies", "request": { "method": "GET", "url": "http://localhost:8080/api/analytics/anomalies" } },
+         { "name": "GET /forecast", "request": { "method": "GET", "url": "http://localhost:8080/api/analytics/forecast" } },
+         { "name": "GET /benchmarks", "request": { "method": "GET", "url": "http://localhost:8080/api/analytics/benchmarks" } },
+         { "name": "GET /bottlenecks", "request": { "method": "GET", "url": "http://localhost:8080/api/analytics/bottlenecks" } },
+         { "name": "GET /weekly-insights", "request": { "method": "GET", "url": "http://localhost:8080/api/analytics/weekly-insights" } },
+         { "name": "GET /risk-ranking", "request": { "method": "GET", "url": "http://localhost:8080/api/analytics/risk-ranking" } },
+         { "name": "GET /strategic", "request": { "method": "GET", "url": "http://localhost:8080/api/analytics/strategic" } }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+         { "name": "POST /register", "request": { "method": "POST", "url": "http://localhost:8080/api/auth/register" } },
+         { "name": "POST /login", "request": { "method": "POST", "url": "http://localhost:8080/api/auth/login" } },
+         { "name": "POST /logout", "request": { "method": "POST", "url": "http://localhost:8080/api/auth/logout" } },
+         { "name": "POST /verify-email-otp", "request": { "method": "POST", "url": "http://localhost:8080/api/auth/verify-email-otp" } },
+         { "name": "POST /verify-2fa", "request": { "method": "POST", "url": "http://localhost:8080/api/auth/verify-2fa" } },
+         { "name": "POST /sso-login", "request": { "method": "POST", "url": "http://localhost:8080/api/auth/sso-login" } },
+         { "name": "POST /verify-device", "request": { "method": "POST", "url": "http://localhost:8080/api/auth/verify-device" } },
+         { "name": "POST /forgot-password", "request": { "method": "POST", "url": "http://localhost:8080/api/auth/forgot-password" } },
+         { "name": "POST /reset-password", "request": { "method": "POST", "url": "http://localhost:8080/api/auth/reset-password" } },
+         { "name": "POST /switch-role", "request": { "method": "POST", "url": "http://localhost:8080/api/auth/switch-role" } }
+      ]
+    },
+    {
+      "name": "Client Management",
+      "item": [
+         { "name": "POST /clients", "request": { "method": "POST", "url": "http://localhost:8080/api/clients" } },
+         { "name": "GET /clients/{id}", "request": { "method": "GET", "url": "http://localhost:8080/api/clients/:id" } },
+         { "name": "POST /kyc/verify", "request": { "method": "POST", "url": "http://localhost:8080/api/kyc/verify" } },
+         { "name": "POST /cibil/enquiry", "request": { "method": "POST", "url": "http://localhost:8080/api/cibil/enquiry" } },
+         { "name": "GET /groups/{id}", "request": { "method": "GET", "url": "http://localhost:8080/api/groups/:id" } },
+         { "name": "POST /clients/{id}/verify-income", "request": { "method": "POST", "url": "http://localhost:8080/api/clients/:id/verify-income" } },
+         { "name": "POST /clients/{id}/assess-credit", "request": { "method": "POST", "url": "http://localhost:8080/api/clients/:id/assess-credit" } },
+         { "name": "PUT /clients/{id}/override-score", "request": { "method": "PUT", "url": "http://localhost:8080/api/clients/:id/override-score" } },
+         { "name": "GET /clients/{id}/credit-report", "request": { "method": "GET", "url": "http://localhost:8080/api/clients/:id/credit-report" } }
+      ]
+    },
+    {
+      "name": "Collection Management",
+      "item": [
+         { "name": "POST /record", "request": { "method": "POST", "url": "http://localhost:8080/api/collections/record" } },
+         { "name": "POST /sync", "request": { "method": "POST", "url": "http://localhost:8080/api/collections/sync" } },
+         { "name": "POST /group-payment", "request": { "method": "POST", "url": "http://localhost:8080/api/collections/group-payment" } },
+         { "name": "POST /reconcile", "request": { "method": "POST", "url": "http://localhost:8080/api/collections/reconcile" } },
+         { "name": "GET /calendar", "request": { "method": "GET", "url": "http://localhost:8080/api/collections/calendar" } },
+         { "name": "POST /overdue-escalation", "request": { "method": "POST", "url": "http://localhost:8080/api/collections/overdue-escalation" } },
+         { "name": "GET /dashboard", "request": { "method": "GET", "url": "http://localhost:8080/api/collections/dashboard" } },
+         { "name": "POST /waiver/request", "request": { "method": "POST", "url": "http://localhost:8080/api/collections/waiver/request" } },
+         { "name": "POST /waiver/{id}/approve", "request": { "method": "POST", "url": "http://localhost:8080/api/collections/waiver/:id/approve" } },
+         { "name": "GET /receipt/{id}", "request": { "method": "GET", "url": "http://localhost:8080/api/collections/receipt/:id" } }
+      ]
+    },
+    {
+      "name": "Data Security",
+      "item": [
+         { "name": "POST /audit-log", "request": { "method": "POST", "url": "http://localhost:8080/api/security/audit-log" } },
+         { "name": "GET /check-intrusion", "request": { "method": "GET", "url": "http://localhost:8080/api/security/check-intrusion" } },
+         { "name": "POST /sanitize", "request": { "method": "POST", "url": "http://localhost:8080/api/security/sanitize" } },
+         { "name": "POST /retention/run", "request": { "method": "POST", "url": "http://localhost:8080/api/security/retention/run" } },
+         { "name": "POST /backup", "request": { "method": "POST", "url": "http://localhost:8080/api/security/backup" } },
+         { "name": "POST /scan", "request": { "method": "POST", "url": "http://localhost:8080/api/security/scan" } },
+         { "name": "GET /compliance-package", "request": { "method": "GET", "url": "http://localhost:8080/api/security/compliance-package" } }
+      ]
+    },
+    {
+      "name": "Delinquency Management",
+      "item": [
+         { "name": "POST /daily-cron", "request": { "method": "POST", "url": "http://localhost:8080/api/delinquency/daily-cron" } },
+         { "name": "GET /write-off/recommendations", "request": { "method": "GET", "url": "http://localhost:8080/api/delinquency/write-off/recommendations" } },
+         { "name": "POST /write-off/{id}", "request": { "method": "POST", "url": "http://localhost:8080/api/delinquency/write-off/:id" } },
+         { "name": "POST /write-off/{id}/recovery", "request": { "method": "POST", "url": "http://localhost:8080/api/delinquency/write-off/:id/recovery" } },
+         { "name": "POST /legal-action", "request": { "method": "POST", "url": "http://localhost:8080/api/delinquency/legal-action" } },
+         { "name": "GET /npa-movement", "request": { "method": "GET", "url": "http://localhost:8080/api/delinquency/npa-movement" } },
+         { "name": "POST /ots/propose", "request": { "method": "POST", "url": "http://localhost:8080/api/delinquency/ots/propose" } },
+         { "name": "POST /ots/{id}/approve", "request": { "method": "POST", "url": "http://localhost:8080/api/delinquency/ots/:id/approve" } }
+      ]
+    },
+    {
+      "name": "Exception Analytics",
+      "item": [
+         { "name": "GET /exception-analytics", "request": { "method": "GET", "url": "http://localhost:8080/api/admin/exception-analytics" } }
+      ]
+    },
+    {
+      "name": "Group Lending",
+      "item": [
+         { "name": "POST /create", "request": { "method": "POST", "url": "http://localhost:8080/api/groups/create" } },
+         { "name": "POST /{id}/grt/schedule", "request": { "method": "POST", "url": "http://localhost:8080/api/groups/:id/grt/schedule" } },
+         { "name": "POST /{id}/grt/pass", "request": { "method": "POST", "url": "http://localhost:8080/api/groups/:id/grt/pass" } },
+         { "name": "POST /{id}/training/attend", "request": { "method": "POST", "url": "http://localhost:8080/api/groups/:id/training/attend" } },
+         { "name": "GET /{id}/liability-health", "request": { "method": "GET", "url": "http://localhost:8080/api/groups/:id/liability-health" } },
+         { "name": "POST /savings/deposit", "request": { "method": "POST", "url": "http://localhost:8080/api/groups/savings/deposit" } },
+         { "name": "POST /member/add", "request": { "method": "POST", "url": "http://localhost:8080/api/groups/member/add" } },
+         { "name": "POST /member/exit", "request": { "method": "POST", "url": "http://localhost:8080/api/groups/member/exit" } },
+         { "name": "POST /meetings/record", "request": { "method": "POST", "url": "http://localhost:8080/api/groups/meetings/record" } },
+         { "name": "GET /graduation-status/{clientId}", "request": { "method": "GET", "url": "http://localhost:8080/api/groups/graduation-status/:clientId" } }
+      ]
+    },
+    {
+      "name": "System Info",
+      "item": [
+         { "name": "GET /info", "request": { "method": "GET", "url": "http://localhost:8080/api/info" } }
+      ]
+    },
+    {
+      "name": "Loan Management",
+      "item": [
+         { "name": "POST /loans/apply", "request": { "method": "POST", "url": "http://localhost:8080/api/loans/apply" } },
+         { "name": "GET /loans/{id}", "request": { "method": "GET", "url": "http://localhost:8080/api/loans/:id" } },
+         { "name": "PUT /loans/{id}/approve", "request": { "method": "PUT", "url": "http://localhost:8080/api/loans/:id/approve" } },
+         { "name": "POST /loans/{id}/disburse", "request": { "method": "POST", "url": "http://localhost:8080/api/loans/:id/disburse" } },
+         { "name": "GET /loans/client/{id}", "request": { "method": "GET", "url": "http://localhost:8080/api/loans/client/:id" } },
+         { "name": "GET /emi/schedule/{loanId}", "request": { "method": "GET", "url": "http://localhost:8080/api/emi/schedule/:loanId" } },
+         { "name": "POST /collections", "request": { "method": "POST", "url": "http://localhost:8080/api/collections" } },
+         { "name": "GET /collections/overdue", "request": { "method": "GET", "url": "http://localhost:8080/api/collections/overdue" } },
+         { "name": "GET /emi/receipt/{id}", "request": { "method": "GET", "url": "http://localhost:8080/api/emi/receipt/:id" } },
+         { "name": "GET /portfolio/par", "request": { "method": "GET", "url": "http://localhost:8080/api/portfolio/par" } },
+         { "name": "PUT /loans/{id}/reject", "request": { "method": "PUT", "url": "http://localhost:8080/api/loans/:id/reject" } },
+         { "name": "GET /loans/{id}/timeline", "request": { "method": "GET", "url": "http://localhost:8080/api/loans/:id/timeline" } },
+         { "name": "GET /loans/{id}/rejection-letter", "request": { "method": "GET", "url": "http://localhost:8080/api/loans/:id/rejection-letter" } },
+         { "name": "POST /loans/{id}/committee-signoff", "request": { "method": "POST", "url": "http://localhost:8080/api/loans/:id/committee-signoff" } },
+         { "name": "GET /loans/{id}/deliberations", "request": { "method": "GET", "url": "http://localhost:8080/api/loans/:id/deliberations" } },
+         { "name": "POST /loans/{id}/disbursement/prepare", "request": { "method": "POST", "url": "http://localhost:8080/api/loans/:id/disbursement/prepare" } },
+         { "name": "POST /loans/{id}/disbursement/approve", "request": { "method": "POST", "url": "http://localhost:8080/api/loans/:id/disbursement/approve" } },
+         { "name": "POST /loans/{id}/utilization", "request": { "method": "POST", "url": "http://localhost:8080/api/loans/:id/utilization" } },
+         { "name": "POST /loans/{id}/restructure", "request": { "method": "POST", "url": "http://localhost:8080/api/loans/:id/restructure" } }
+      ]
+    },
+    {
+      "name": "Mobile Operations",
+      "item": [
+         { "name": "POST /attendance/check-in", "request": { "method": "POST", "url": "http://localhost:8080/api/mobile/attendance/check-in" } },
+         { "name": "POST /agreement/sign", "request": { "method": "POST", "url": "http://localhost:8080/api/mobile/agreement/sign" } },
+         { "name": "GET /route/optimize", "request": { "method": "GET", "url": "http://localhost:8080/api/mobile/route/optimize" } },
+         { "name": "POST /photo-doc", "request": { "method": "POST", "url": "http://localhost:8080/api/mobile/photo-doc" } },
+         { "name": "POST /field-note", "request": { "method": "POST", "url": "http://localhost:8080/api/mobile/field-note" } },
+         { "name": "GET /sync-dashboard", "request": { "method": "GET", "url": "http://localhost:8080/api/mobile/sync-dashboard" } },
+         { "name": "POST /security/failed-unlock", "request": { "method": "POST", "url": "http://localhost:8080/api/mobile/security/failed-unlock" } },
+         { "name": "GET /scorecard", "request": { "method": "GET", "url": "http://localhost:8080/api/mobile/scorecard" } }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+         { "name": "POST /trigger-daily", "request": { "method": "POST", "url": "http://localhost:8080/api/notifications/trigger-daily" } },
+         { "name": "POST /agent-targets", "request": { "method": "POST", "url": "http://localhost:8080/api/notifications/agent-targets" } },
+         { "name": "POST /broadcast", "request": { "method": "POST", "url": "http://localhost:8080/api/notifications/broadcast" } },
+         { "name": "GET /logs", "request": { "method": "GET", "url": "http://localhost:8080/api/notifications/logs" } }
+      ]
+    },
+    {
+      "name": "Portfolio Analytics",
+      "item": [
+         { "name": "GET /par-segmented", "request": { "method": "GET", "url": "http://localhost:8080/api/portfolio/par-segmented" } },
+         { "name": "GET /vintage", "request": { "method": "GET", "url": "http://localhost:8080/api/portfolio/vintage" } },
+         { "name": "GET /collection-efficiency", "request": { "method": "GET", "url": "http://localhost:8080/api/portfolio/collection-efficiency" } },
+         { "name": "GET /yield-cost", "request": { "method": "GET", "url": "http://localhost:8080/api/portfolio/yield-cost" } },
+         { "name": "GET /officers-productivity", "request": { "method": "GET", "url": "http://localhost:8080/api/portfolio/officers-productivity" } },
+         { "name": "GET /delinquency-heatmap", "request": { "method": "GET", "url": "http://localhost:8080/api/portfolio/delinquency-heatmap" } },
+         { "name": "GET /product-profitability", "request": { "method": "GET", "url": "http://localhost:8080/api/portfolio/product-profitability" } },
+         { "name": "GET /clv", "request": { "method": "GET", "url": "http://localhost:8080/api/portfolio/clv" } },
+         { "name": "GET /early-warning", "request": { "method": "GET", "url": "http://localhost:8080/api/portfolio/early-warning" } },
+         { "name": "GET /mis-report", "request": { "method": "GET", "url": "http://localhost:8080/api/portfolio/mis-report" } }
+      ]
+    },
+    {
+      "name": "Regulatory Compliance",
+      "item": [
+         { "name": "GET /cibil-export", "request": { "method": "GET", "url": "http://localhost:8080/api/compliance/cibil-export" } },
+         { "name": "GET /rbi-export", "request": { "method": "GET", "url": "http://localhost:8080/api/compliance/rbi-export" } },
+         { "name": "GET /mfin-report", "request": { "method": "GET", "url": "http://localhost:8080/api/compliance/mfin-report" } },
+         { "name": "GET /agreement/{loanId}", "request": { "method": "GET", "url": "http://localhost:8080/api/compliance/agreement/:loanId" } },
+         { "name": "GET /kyc-reminders", "request": { "method": "GET", "url": "http://localhost:8080/api/compliance/kyc-reminders" } },
+         { "name": "GET /branch-report", "request": { "method": "GET", "url": "http://localhost:8080/api/compliance/branch-report" } },
+         { "name": "GET /stress-test", "request": { "method": "GET", "url": "http://localhost:8080/api/compliance/stress-test" } },
+         { "name": "GET /alerts", "request": { "method": "GET", "url": "http://localhost:8080/api/compliance/alerts" } }
+      ]
+    },
+    {
+      "name": "System Administration",
+      "item": [
+         { "name": "POST /users/{id}/lifecycle", "request": { "method": "POST", "url": "http://localhost:8080/api/admin/users/:id/lifecycle" } },
+         { "name": "POST /config", "request": { "method": "POST", "url": "http://localhost:8080/api/admin/config" } },
+         { "name": "GET /dashboard", "request": { "method": "GET", "url": "http://localhost:8080/api/admin/dashboard" } },
+         { "name": "POST /bulk-import/clients", "request": { "method": "POST", "url": "http://localhost:8080/api/admin/bulk-import/clients" } },
+         { "name": "GET /health", "request": { "method": "GET", "url": "http://localhost:8080/api/admin/health" } },
+         { "name": "GET /audit-logs/search", "request": { "method": "GET", "url": "http://localhost:8080/api/admin/audit-logs/search" } },
+         { "name": "GET /integrations", "request": { "method": "GET", "url": "http://localhost:8080/api/admin/integrations" } },
+         { "name": "GET /template", "request": { "method": "GET", "url": "http://localhost:8080/api/admin/template" } }
+      ]
+    },
+    {
+      "name": "User Management",
+      "item": [
+         { "name": "GET /profile", "request": { "method": "GET", "url": "http://localhost:8080/api/users/profile" } },
+         { "name": "PUT /profile", "request": { "method": "PUT", "url": "http://localhost:8080/api/users/profile" } },
+         { "name": "PUT /{id}/approve", "request": { "method": "PUT", "url": "http://localhost:8080/api/users/:id/approve" } },
+         { "name": "GET /audit-logs", "request": { "method": "GET", "url": "http://localhost:8080/api/users/audit-logs" } },
+         { "name": "PUT /{id}/unlock", "request": { "method": "PUT", "url": "http://localhost:8080/api/users/:id/unlock" } },
+         { "name": "POST /profile/report-breach", "request": { "method": "POST", "url": "http://localhost:8080/api/users/profile/report-breach" } },
+         { "name": "POST /{id}/report-breach", "request": { "method": "POST", "url": "http://localhost:8080/api/users/:id/report-breach" } },
+         { "name": "POST /profile/emergency-override", "request": { "method": "POST", "url": "http://localhost:8080/api/users/profile/emergency-override" } }
+      ]
+    }
+  ]
+}

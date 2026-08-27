@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body { font-family: Arial, sans-serif; line-height: 1.6; margin: 40px auto; max-width: 900px; padding: 20px; color: #333; }
+h1, h2, h3 { color: #2c3e50; }
+h1 { text-align: center; margin-bottom: 50px; font-size: 2.5em; }
+h2 { border-bottom: 2px solid #3498db; padding-bottom: 5px; margin-top: 40px; }
+pre { background: #f4f4f4; border: 1px solid #ddd; padding: 15px; border-radius: 5px; overflow-x: auto; font-family: Consolas, monospace; }
+code { color: #d63200; font-family: Consolas, monospace; }
+.module { margin-bottom: 50px; }
+</style>
+<title>Project Documentation</title>
+</head>
+<body>
+
+<h1>APPLICATION DEVELOPMENT<br><br>MICROFINANCE LOAN MANAGEMENT SYSTEM</h1>
+
+<h2>FILE AND FOLDER STRUCTURE</h2>
+<pre>
+MICROFINANCE-LOAN-SYSTEM
+└── backend
+    ├── src
+    │   └── main
+    │       └── java
+    │           └── com
+    │               └── example
+    │                   └── microfinance_loan_system
+    │                       ├── config
+    │                       ├── controller
+    │                       ├── dto
+    │                       ├── exception
+    │                       ├── model
+    │                       ├── repository
+    │                       └── service
+    └── pom.xml
+</pre>
+
+<div class="module">
+    <h2>1. AUTHENTICATION MODULE</h2>
+    <h3>AUTH CONTROLLER:</h3>
+<pre>
+@RestController
+@RequestMapping("/api/auth")
+public class AuthController {
+    @Autowired
+    private AuthService authService;
+
+    @PostMapping("/register")
+    public ResponseEntity&lt;User&gt; register(@Valid @RequestBody RegisterRequest request) {
+        User registered = authService.register(request);
+        return new ResponseEntity&lt;&gt;(registered, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity&lt;LoginResponse&gt; login(@Valid @RequestBody LoginRequest request) {
+        LoginResponse response = authService.login(request.getEmail(), request.getPassword());
+        return ResponseEntity.ok(response);
+    }
+}
+</pre>
+    
+    <h3>AUTH DTO:</h3>
+<pre>
+@Data
+public class LoginRequest {
+    @NotBlank
+    private String email;
+    @NotBlank
+    private String password;
+}
+</pre>
+
+    <h3>SWAGGER EXPECTED OUTPUT (POST /login):</h3>
+    <p><strong>Request Body:</strong></p>
+<pre>
+{
+  "email": "johndoe@gmail.com",
+  "password": "Password123"
+}
+</pre>
+    <p><strong>Response (200 OK):</strong></p>
+<pre>
+{
+  "token": "eyJhbGciOiJIUzI1Ni...",
+  "tokenType": "Bearer",
+  "userId": 1,
+  "email": "johndoe@gmail.com",
+  "role": "ADMIN"
+}
+</pre>
+</div>
+
+<div class="module">
+    <h2>2. CLIENT MODULE</h2>
+    <h3>CLIENT CONTROLLER:</h3>
+<pre>
+@RestController
+@RequestMapping("/api/clients")
+public class ClientController {
+    @Autowired
+    private ClientService clientService;
+
+    @PostMapping
+    public ResponseEntity&lt;Client&gt; createClient(@Valid @RequestBody ClientRegistrationRequest request) {
+        return ResponseEntity.ok(clientService.registerClient(request));
+    }
+}
+</pre>
+    
+    <h3>SWAGGER EXPECTED OUTPUT (POST /clients):</h3>
+    <p><strong>Request Body:</strong></p>
+<pre>
+{
+  "firstName": "Jane",
+  "lastName": "Smith",
+  "aadhaarNumber": "123456789012"
+}
+</pre>
+    <p><strong>Response (200 OK):</strong></p>
+<pre>
+{
+  "id": 101,
+  "firstName": "Jane",
+  "lastName": "Smith",
+  "aadhaarNumber": "123456789012",
+  "status": "ACTIVE"
+}
+</pre>
+</div>
+
+<div class="module">
+    <h2>3. LOAN MODULE</h2>
+    <h3>LOAN CONTROLLER:</h3>
+<pre>
+@RestController
+@RequestMapping("/api/loans")
+public class LoanController {
+    @PostMapping("/apply")
+    public ResponseEntity&lt;LoanApplication&gt; applyForLoan(@Valid @RequestBody LoanApplicationRequest request) {
+        return ResponseEntity.ok(loanService.apply(request));
+    }
+}
+</pre>
+    
+    <h3>SWAGGER EXPECTED OUTPUT (POST /loans/apply):</h3>
+    <p><strong>Request Body:</strong></p>
+<pre>
+{
+  "clientId": 101,
+  "amount": 50000,
+  "durationInMonths": 12,
+  "interestRate": 12.5
+}
+</pre>
+    <p><strong>Response (200 OK):</strong></p>
+<pre>
+{
+  "id": 1,
+  "clientId": 101,
+  "amount": 50000,
+  "status": "PENDING_APPROVAL"
+}
+</pre>
+</div>
+
+</body>
+</html>
