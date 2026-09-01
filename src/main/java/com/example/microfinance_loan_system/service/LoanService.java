@@ -16,6 +16,10 @@ public class LoanService {
     private ClientRepository clientRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private EMIScheduleRepository emiScheduleRepository;
+    @Autowired
+    private CollectionRepository collectionRepository;
     public LoanApplication applyForLoan(LoanApplyRequest request) {
         Client client = clientRepository.findById(request.getClientId())
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -80,6 +84,19 @@ public class LoanService {
         return loanApplicationRepository.save(loan);
     }
     @Transactional
+    public LoanApplication rejectLoan(Long id) {
+        LoanApplication loan = getLoanById(id);
+
+        if (loan.getStatus() == LoanStatus.DISBURSED || loan.getStatus() == LoanStatus.CLOSED) {
+            throw new IllegalStateException(
+                    "Cannot reject loan in status: " + loan.getStatus());
+        }
+
+        loan.setStatus(LoanStatus.REJECTED);
+        return loanApplicationRepository.save(loan);
+    }
+
+    @Transactional
     public LoanApplication disburseLoan(Long id) {
         LoanApplication loan = getLoanById(id);
 
@@ -100,5 +117,24 @@ public class LoanService {
 
         loan.setStatus(LoanStatus.DISBURSED);
         return loanApplicationRepository.save(loan);
+    }
+
+    @Transactional
+    public void deleteLoan(Long id) {
+        LoanApplication loan = getLoanById(id);
+
+        // Clean up EMI schedules and payments/collections
+        List<EMISchedule> schedules = emiScheduleRepository.findByLoanId(id);
+        for (EMISchedule sch : schedules) {
+            List<Collection> collections = collectionRepository.findAllByEmiId(sch.getId());
+            if (!collections.isEmpty()) {
+                collectionRepository.deleteAll(collections);
+            }
+        }
+        if (!schedules.isEmpty()) {
+            emiScheduleRepository.deleteAll(schedules);
+        }
+
+        loanApplicationRepository.delete(loan);
     }
 }

@@ -44,6 +44,24 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public User approveUser(Long id) {
+        User user = getUserById(id);
+        user.setStatus("ACTIVE");
+        return userRepository.save(user);
+    }
+
+    public User unlockUser(Long id) {
+        User user = getUserById(id);
+        user.setStatus("ACTIVE");
+        return userRepository.save(user);
+    }
+
+    public User updateUserStatus(Long id, String status) {
+        User user = getUserById(id);
+        user.setStatus(status.toUpperCase());
+        return userRepository.save(user);
+    }
+
     public void deleteUser(Long id) {
         User user = getUserById(id);
         userRepository.delete(user);

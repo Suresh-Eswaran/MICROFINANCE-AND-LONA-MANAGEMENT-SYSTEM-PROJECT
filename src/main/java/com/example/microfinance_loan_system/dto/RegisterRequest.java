@@ -21,5 +21,6 @@ public class RegisterRequest {
     @NotNull(message = "Role is required")
     private String role; // ADMIN, BRANCH_MANAGER, CREDIT_OFFICER, LOAN_OFFICER, COLLECTIONS_AGENT, CLIENT
 
+    @NotBlank(message = "Branch is required")
     private String branch;
 }

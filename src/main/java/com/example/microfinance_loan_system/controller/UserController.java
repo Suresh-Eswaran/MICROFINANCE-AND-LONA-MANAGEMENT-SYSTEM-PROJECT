@@ -48,6 +48,24 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUserProfile(id, request));
     }
 
+    @PutMapping("/{id}/approve")
+    @PreAuthorize("hasAnyRole('ADMIN','BRANCH_MANAGER')")
+    public ResponseEntity<User> approveUser(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.approveUser(id));
+    }
+
+    @PutMapping("/{id}/unlock")
+    @PreAuthorize("hasAnyRole('ADMIN','BRANCH_MANAGER')")
+    public ResponseEntity<User> unlockUser(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.unlockUser(id));
+    }
+
+    @PutMapping("/{id}/status")
+    @PreAuthorize("hasAnyRole('ADMIN','BRANCH_MANAGER')")
+    public ResponseEntity<User> updateUserStatus(@PathVariable Long id, @RequestParam String status) {
+        return ResponseEntity.ok(userService.updateUserStatus(id, status));
+    }
+
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {

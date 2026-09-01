@@ -11,13 +11,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/loans")
 public class LoanController {
     @Autowired
     private LoanService loanService;
     @PostMapping("/apply")
-    @PreAuthorize("hasAnyRole('ADMIN','BRANCH_MANAGER','CREDIT_OFFICER','LOAN_OFFICER')")
+    @PreAuthorize("hasAnyRole('ADMIN','BRANCH_MANAGER','CREDIT_OFFICER','LOAN_OFFICER','CLIENT')")
     public ResponseEntity<LoanApplication> applyForLoan(@Valid @RequestBody LoanApplyRequest request) {
         LoanApplication loan = loanService.applyForLoan(request);
         return new ResponseEntity<>(loan, HttpStatus.CREATED);
@@ -33,7 +35,7 @@ public class LoanController {
         return ResponseEntity.ok(loanService.getLoansByClientId(clientId));
     }
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN','BRANCH_MANAGER','CREDIT_OFFICER','LOAN_OFFICER','COLLECTIONS_AGENT')")
+    @PreAuthorize("hasAnyRole('ADMIN','BRANCH_MANAGER','CREDIT_OFFICER','LOAN_OFFICER','COLLECTIONS_AGENT','CLIENT')")
     public ResponseEntity<List<LoanApplication>> getAllLoans() {
         return ResponseEntity.ok(loanService.getAllLoans());
     }
@@ -42,9 +44,21 @@ public class LoanController {
     public ResponseEntity<LoanApplication> approveLoan(@PathVariable Long id) {
         return ResponseEntity.ok(loanService.approveLoan(id));
     }
+    @PutMapping("/{id}/reject")
+    @PreAuthorize("hasAnyRole('ADMIN','BRANCH_MANAGER')")
+    public ResponseEntity<LoanApplication> rejectLoan(@PathVariable Long id) {
+        return ResponseEntity.ok(loanService.rejectLoan(id));
+    }
     @PostMapping("/{id}/disburse")
     @PreAuthorize("hasAnyRole('ADMIN','BRANCH_MANAGER')")
     public ResponseEntity<LoanApplication> disburseLoan(@PathVariable Long id) {
         return ResponseEntity.ok(loanService.disburseLoan(id));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','BRANCH_MANAGER')")
+    public ResponseEntity<Map<String, String>> deleteLoan(@PathVariable Long id) {
+        loanService.deleteLoan(id);
+        return ResponseEntity.ok(Map.of("message", "Loan #" + id + " and related records deleted successfully."));
     }
 }
