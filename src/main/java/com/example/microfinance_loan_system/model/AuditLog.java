@@ -27,9 +27,13 @@ public class AuditLog {
     @Column(nullable = false)
     private String email;
 
-    @Column(nullable = false)
+    @Column(name = "ip_address", nullable = true)
     private String ipAddress;
 
     @Column(length = 2000)
     private String details;
+
+    @Builder.Default
+    @Column(name = "success")
+    private Boolean success = true;
 }

@@ -12,9 +12,11 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final AuditLogService auditLogService;
 
-    UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, AuditLogService auditLogService) {
         this.userRepository = userRepository;
+        this.auditLogService = auditLogService;
     }
 
     public List<User> getAllUsers() {
@@ -41,29 +43,39 @@ public class UserService {
             user.setEmail(request.getEmail());
         }
         
-        return userRepository.save(user);
+        User saved = userRepository.save(user);
+        auditLogService.log("USER_PROFILE_UPDATED", saved.getId(), saved.getEmail(), "Profile updated: " + saved.getFullName(), true);
+        return saved;
     }
 
     public User approveUser(Long id) {
         User user = getUserById(id);
         user.setStatus("ACTIVE");
-        return userRepository.save(user);
+        User saved = userRepository.save(user);
+        auditLogService.log("USER_APPROVED", saved.getId(), saved.getEmail(), "User account approved and activated by administrator.", true);
+        return saved;
     }
 
     public User unlockUser(Long id) {
         User user = getUserById(id);
         user.setStatus("ACTIVE");
-        return userRepository.save(user);
+        User saved = userRepository.save(user);
+        auditLogService.log("USER_UNLOCKED", saved.getId(), saved.getEmail(), "Suspended user account unlocked by administrator.", true);
+        return saved;
     }
 
     public User updateUserStatus(Long id, String status) {
         User user = getUserById(id);
-        user.setStatus(status.toUpperCase());
-        return userRepository.save(user);
+        String upperStatus = status.toUpperCase();
+        user.setStatus(upperStatus);
+        User saved = userRepository.save(user);
+        auditLogService.log("USER_STATUS_CHANGED", saved.getId(), saved.getEmail(), "Account status set to: " + upperStatus, true);
+        return saved;
     }
 
     public void deleteUser(Long id) {
         User user = getUserById(id);
+        auditLogService.log("USER_DELETED", user.getId(), user.getEmail(), "User account #" + id + " permanently deleted.", true);
         userRepository.delete(user);
     }
 }
