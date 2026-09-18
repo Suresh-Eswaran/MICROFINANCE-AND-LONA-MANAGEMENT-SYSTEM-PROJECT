@@ -123,8 +123,7 @@ public class AuthService {
             "message", "Registration successful! A 6-digit verification code has been sent to " + user.getEmail(),
             "email", user.getEmail(),
             "status", user.getStatus(),
-            "requiresOtp", true,
-            "otp", otp
+            "requiresOtp", true
         );
     }
 

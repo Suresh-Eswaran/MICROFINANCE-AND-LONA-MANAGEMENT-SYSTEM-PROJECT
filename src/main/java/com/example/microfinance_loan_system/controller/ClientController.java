@@ -6,9 +6,12 @@ import com.example.microfinance_loan_system.dto.IncomeVerificationRequest;
 import com.example.microfinance_loan_system.dto.ScoreOverrideRequest;
 import com.example.microfinance_loan_system.model.Client;
 import com.example.microfinance_loan_system.service.ClientService;
+import com.example.microfinance_loan_system.service.CreditReportPdfService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +25,9 @@ public class ClientController {
 
     @Autowired
     private ClientService clientService;
+
+    @Autowired
+    private CreditReportPdfService creditReportPdfService;
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','BRANCH_MANAGER','CREDIT_OFFICER','LOAN_OFFICER','CLIENT')")
@@ -66,6 +72,17 @@ public class ClientController {
     @PreAuthorize("hasAnyRole('ADMIN','BRANCH_MANAGER','CREDIT_OFFICER','LOAN_OFFICER','COLLECTIONS_AGENT','CLIENT')")
     public ResponseEntity<Map<String, String>> getCreditReport(@PathVariable Long id) {
         return ResponseEntity.ok(clientService.getCreditReport(id));
+    }
+
+    @GetMapping("/{id}/credit-report/download")
+    @PreAuthorize("hasAnyRole('ADMIN','BRANCH_MANAGER','CREDIT_OFFICER','LOAN_OFFICER','COLLECTIONS_AGENT','CLIENT')")
+    public ResponseEntity<byte[]> downloadCreditReport(@PathVariable Long id) {
+        byte[] pdfBytes = creditReportPdfService.generateCreditReportPdf(id);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment", "credit-report-" + id + ".pdf");
+        headers.setContentLength(pdfBytes.length);
+        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
     }
 
     @PostMapping("/{id}/verify-income")

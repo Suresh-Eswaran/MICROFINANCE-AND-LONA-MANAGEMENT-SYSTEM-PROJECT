@@ -1,5 +1,3 @@
-
-
 package com.example.microfinance_loan_system.dto;
 
 import jakarta.validation.constraints.*;

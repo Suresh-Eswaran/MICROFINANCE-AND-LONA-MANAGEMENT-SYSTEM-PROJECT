@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
@@ -62,7 +64,28 @@ public class CollectionService {
                 .receiptNumber(receiptNumber)
                 .build();
 
-        return collectionRepository.save(collection);
+        Collection saved = collectionRepository.save(collection);
+
+        // Update EMI status to PAID if total collected >= EMI amount
+        BigDecimal totalCollected = collectionRepository.findAllByEmiId(emi.getId()).stream()
+                .map(Collection::getAmountCollected)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        if (totalCollected.compareTo(emi.getEmiAmount()) >= 0) {
+            emi.setStatus(EmiStatus.PAID);
+            emi.setPaidDate(LocalDateTime.now());
+            emiScheduleRepository.save(emi);
+
+            // If all EMIs are paid, mark loan as CLOSED
+            List<EMISchedule> allEmis = emiScheduleRepository.findByLoanId(loan.getId());
+            boolean allPaid = allEmis.stream().allMatch(e -> e.getStatus() == EmiStatus.PAID || e.getStatus() == EmiStatus.WAIVED);
+            if (allPaid) {
+                loan.setStatus(LoanStatus.CLOSED);
+                loanApplicationRepository.save(loan);
+            }
+        }
+
+        return saved;
     }
 
     // ── Read ────────────────────────────────────────────────────────────────
