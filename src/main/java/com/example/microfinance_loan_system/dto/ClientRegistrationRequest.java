@@ -21,4 +21,8 @@ public class ClientRegistrationRequest {
     private Integer cibilScore;
 
     private Long groupId;
+
+    private String email;
+
+    private Long userId;
 }

@@ -52,6 +52,13 @@ public class CollectionController {
         return ResponseEntity.ok(collectionService.getCollectionsByEmiId(emiId));
     }
 
+    @GetMapping("/my-receipts")
+    @PreAuthorize("hasAnyRole('ADMIN','BRANCH_MANAGER','CREDIT_OFFICER','LOAN_OFFICER','COLLECTIONS_AGENT','CLIENT')")
+    public ResponseEntity<List<Collection>> getMyReceipts() {
+        String email = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
+        return ResponseEntity.ok(collectionService.getReceiptsForClient(email));
+    }
+
     @GetMapping("/all")
     @PreAuthorize("hasAnyRole('ADMIN','BRANCH_MANAGER','LOAN_OFFICER','COLLECTIONS_AGENT')")
     public ResponseEntity<List<Collection>> getAllCollections() {

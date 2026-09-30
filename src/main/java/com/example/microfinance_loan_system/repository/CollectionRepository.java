@@ -13,6 +13,7 @@ import java.util.Optional;
 @Repository
 public interface CollectionRepository extends JpaRepository<Collection, Long> {
     List<Collection> findAllByEmiId(Long emiId);
+    List<Collection> findAllByEmiIdIn(List<Long> emiIds);
     List<Collection> findByCollectedBy(Long collectedBy);
     Optional<Collection> findByReceiptNumber(String receiptNumber);
     List<Collection> findAllByOrderByCollectionDateDesc();

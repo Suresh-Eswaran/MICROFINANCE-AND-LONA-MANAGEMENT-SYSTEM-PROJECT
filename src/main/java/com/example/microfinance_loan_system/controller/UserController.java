@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
@@ -62,8 +63,18 @@ public class UserController {
 
     @PutMapping("/{id}/status")
     @PreAuthorize("hasAnyRole('ADMIN','BRANCH_MANAGER')")
-    public ResponseEntity<User> updateUserStatus(@PathVariable Long id, @RequestParam String status) {
-        return ResponseEntity.ok(userService.updateUserStatus(id, status));
+    public ResponseEntity<User> updateUserStatus(
+            @PathVariable Long id,
+            @RequestParam(required = false) String status,
+            @RequestBody(required = false) Map<String, String> body) {
+        String newStatus = status;
+        if ((newStatus == null || newStatus.isBlank()) && body != null) {
+            newStatus = body.get("status");
+        }
+        if (newStatus == null || newStatus.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(userService.updateUserStatus(id, newStatus));
     }
 
     @DeleteMapping("/{id}")

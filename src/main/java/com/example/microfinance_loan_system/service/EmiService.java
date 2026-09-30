@@ -88,25 +88,11 @@ public class EmiService {
 
     
 
-    @Transactional
     public List<EMISchedule> getScheduleByLoanId(Long loanId) {
         // Ensure loan exists
         loanApplicationRepository.findById(loanId)
                 .orElseThrow(() -> new ResourceNotFoundException("Loan not found with id: " + loanId));
-        List<EMISchedule> list = emiScheduleRepository.findByLoanIdOrderByInstallmentNoAsc(loanId);
-        for (EMISchedule emi : list) {
-            if (emi.getStatus() == EmiStatus.PENDING || emi.getStatus() == EmiStatus.OVERDUE) {
-                BigDecimal totalCollected = collectionRepository.findAllByEmiId(emi.getId()).stream()
-                        .map(Collection::getAmountCollected)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
-                if (totalCollected.compareTo(emi.getEmiAmount()) >= 0) {
-                    emi.setStatus(EmiStatus.PAID);
-                    emi.setPaidDate(LocalDateTime.now());
-                    emiScheduleRepository.save(emi);
-                }
-            }
-        }
-        return list;
+        return emiScheduleRepository.findByLoanIdOrderByInstallmentNoAsc(loanId);
     }
  
     @Transactional

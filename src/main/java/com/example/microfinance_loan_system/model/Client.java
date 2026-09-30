@@ -35,6 +35,12 @@ public class Client {
     @Builder.Default
     private KycStatus kycStatus = KycStatus.PENDING;
 
+    @Column(name = "user_id")
+    private Long userId;
+
+    @Column(name = "email", length = 100)
+    private String email;
+
     @Column(name = "created_date", nullable = false, updatable = false)
     @Builder.Default
     private LocalDateTime createdDate = LocalDateTime.now();

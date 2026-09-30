@@ -6,14 +6,12 @@ import com.example.microfinance_loan_system.dto.IncomeVerificationRequest;
 import com.example.microfinance_loan_system.dto.ScoreOverrideRequest;
 import com.example.microfinance_loan_system.model.Client;
 import com.example.microfinance_loan_system.service.ClientService;
-import com.example.microfinance_loan_system.service.CreditReportPdfService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,8 +24,12 @@ public class ClientController {
     @Autowired
     private ClientService clientService;
 
-    @Autowired
-    private CreditReportPdfService creditReportPdfService;
+    @GetMapping("/me")
+    @PreAuthorize("hasAnyRole('ADMIN','BRANCH_MANAGER','CREDIT_OFFICER','LOAN_OFFICER','COLLECTIONS_AGENT','CLIENT')")
+    public ResponseEntity<Client> getCurrentClient() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return ResponseEntity.ok(clientService.getClientForCurrentUser(email));
+    }
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','BRANCH_MANAGER','CREDIT_OFFICER','LOAN_OFFICER','CLIENT')")
@@ -36,7 +38,7 @@ public class ClientController {
         return new ResponseEntity<>(client, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id:[0-9]+}")
     @PreAuthorize("hasAnyRole('ADMIN','BRANCH_MANAGER','CREDIT_OFFICER','LOAN_OFFICER','COLLECTIONS_AGENT','CLIENT')")
     public ResponseEntity<Client> getClient(@PathVariable Long id) {
         return ResponseEntity.ok(clientService.getClientById(id));
@@ -57,9 +59,9 @@ public class ClientController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','BRANCH_MANAGER')")
-    public ResponseEntity<Map<String, String>> deleteClient(@PathVariable Long id) {
+    public ResponseEntity<String> deleteClient(@PathVariable Long id) {
         clientService.deleteClient(id);
-        return ResponseEntity.ok(Map.of("message", "Client #" + id + " and completed loan records deleted successfully."));
+        return ResponseEntity.ok("Client " + id + " deleted successfully.");
     }
 
     @PostMapping("/{id}/assess-credit")
@@ -72,17 +74,6 @@ public class ClientController {
     @PreAuthorize("hasAnyRole('ADMIN','BRANCH_MANAGER','CREDIT_OFFICER','LOAN_OFFICER','COLLECTIONS_AGENT','CLIENT')")
     public ResponseEntity<Map<String, String>> getCreditReport(@PathVariable Long id) {
         return ResponseEntity.ok(clientService.getCreditReport(id));
-    }
-
-    @GetMapping("/{id}/credit-report/download")
-    @PreAuthorize("hasAnyRole('ADMIN','BRANCH_MANAGER','CREDIT_OFFICER','LOAN_OFFICER','COLLECTIONS_AGENT','CLIENT')")
-    public ResponseEntity<byte[]> downloadCreditReport(@PathVariable Long id) {
-        byte[] pdfBytes = creditReportPdfService.generateCreditReportPdf(id);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentDispositionFormData("attachment", "credit-report-" + id + ".pdf");
-        headers.setContentLength(pdfBytes.length);
-        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
     }
 
     @PostMapping("/{id}/verify-income")

@@ -1,5 +1,3 @@
-
-
 package com.example.microfinance_loan_system.service;
 
 import jakarta.mail.MessagingException;
@@ -70,9 +68,10 @@ public class EmailService {
         }
     }
 
-    public boolean sendRegistrationOtpEmail(String toEmail, String fullName, String otp) {
+    public boolean sendRegistrationOtpEmail(String toEmail, String otp, String fullName) {
+        String displayName = (fullName != null && !fullName.isBlank()) ? fullName : "User";
         if (mailSender == null) {
-            logger.warn("JavaMailSender is not initialized. Registration OTP [{}] for [{}] logged to console only.", otp, toEmail);
+            logger.warn("JavaMailSender is not initialized. Registration OTP [{}] for [{}] ({}) logged to console only.", otp, toEmail, displayName);
             return false;
         }
 
@@ -86,23 +85,21 @@ public class EmailService {
                 helper.setFrom(fromEmail);
             }
             helper.setTo(toEmail);
-            helper.setSubject("MicroFin — Complete Your Registration: Verification Code " + otp);
-
-            String displayName = (fullName != null && !fullName.trim().isEmpty()) ? fullName.trim() : "New User";
+            helper.setSubject("MicroFin — Verify Your Account: " + otp);
 
             String htmlContent = "<div style=\"font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #0f172a; color: #f8fafc; padding: 32px; border-radius: 16px; border: 1px solid #1e293b;\">"
                     + "<div style=\"display: flex; align-items: center; margin-bottom: 24px;\">"
-                    + "<div style=\"background: linear-gradient(135deg, #10b981, #059669); color: white; width: 42px; height: 42px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; font-size: 22px; font-weight: bold; margin-right: 12px;\">💰</div>"
+                    + "<div style=\"background: linear-gradient(135deg, #10b981, #059669); color: white; width: 42px; height: 42px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; font-size: 22px; font-weight: bold; margin-right: 12px;\">✨</div>"
                     + "<h2 style=\"color: #f8fafc; margin: 0; font-size: 20px;\">MicroFin Loan System</h2>"
                     + "</div>"
-                    + "<h3 style=\"color: #10b981; margin-top: 0;\">Welcome to MicroFin, " + displayName + "!</h3>"
-                    + "<p style=\"color: #94a3b8; font-size: 15px; line-height: 1.6;\">Thank you for registering your account with MicroFin (<strong>" + toEmail + "</strong>). To activate your account and verify your identity, please enter the 6-digit verification code below:</p>"
+                    + "<h3 style=\"color: #10b981; margin-top: 0;\">Welcome, " + displayName + "!</h3>"
+                    + "<p style=\"color: #94a3b8; font-size: 15px; line-height: 1.6;\">Thank you for registering. Please enter the 6-digit verification code below to verify your email address and activate your MicroFin account:</p>"
                     + "<div style=\"text-align: center; margin: 28px 0;\">"
-                    + "<span style=\"display: inline-block; background-color: #1e293b; color: #34d399; font-size: 34px; font-weight: 800; letter-spacing: 6px; padding: 14px 28px; border-radius: 12px; border: 2px dashed #10b981;\">"
+                    + "<span style=\"display: inline-block; background-color: #1e293b; color: #34d399; font-size: 32px; font-weight: 800; letter-spacing: 6px; padding: 14px 28px; border-radius: 12px; border: 2px dashed #10b981;\">"
                     + otp
                     + "</span>"
                     + "</div>"
-                    + "<p style=\"color: #94a3b8; font-size: 14px;\">⏳ This verification code will expire in <strong>15 minutes</strong>. If you did not create an account with MicroFin, please disregard this email.</p>"
+                    + "<p style=\"color: #94a3b8; font-size: 14px;\">⏳ This verification code will expire in <strong>15 minutes</strong>. If you did not sign up for MicroFin, please ignore this email.</p>"
                     + "<hr style=\"border: none; border-top: 1px solid #334155; margin: 28px 0;\" />"
                     + "<p style=\"color: #64748b; font-size: 12px; margin: 0; text-align: center;\">&copy; MicroFin Loan Management System. All rights reserved.</p>"
                     + "</div>";

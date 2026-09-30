@@ -51,11 +51,29 @@ public class ClientService {
     @Autowired
     private CreditAssessmentHistoryRepository creditAssessmentHistoryRepository;
 
+    @Autowired
+    private com.example.microfinance_loan_system.repository.UserRepository userRepository;
+
     public Client registerClient(ClientRegistrationRequest request) {
         validateName(request.getName());
         validatePhone(request.getPhoneNumber());
         if (clientRepository.findByPhoneNumber(request.getPhoneNumber()).isPresent()) {
             throw new DuplicateLoanException("Phone number already registered: " + request.getPhoneNumber());
+        }
+
+        String userEmail = request.getEmail();
+        if ((userEmail == null || userEmail.isBlank()) && org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication() != null) {
+            String authName = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
+            if (authName != null && !authName.equalsIgnoreCase("anonymousUser")) {
+                userEmail = authName;
+            }
+        }
+        if (userEmail != null) {
+            userEmail = userEmail.trim().toLowerCase();
+        }
+
+        if (userEmail != null && !userEmail.isBlank() && clientRepository.findByEmail(userEmail).isPresent()) {
+            throw new DuplicateLoanException("A client profile is already registered for email: " + userEmail);
         }
 
         Client client = Client.builder()
@@ -64,14 +82,41 @@ public class ClientService {
                 .panNumber(request.getPanNumber())
                 .cibilScore(request.getCibilScore() != null ? request.getCibilScore() : 720)
                 .groupId(request.getGroupId())
+                .email(userEmail)
+                .userId(request.getUserId())
                 .kycStatus(KycStatus.PENDING)
                 .build();
+
+        if (client.getUserId() == null && client.getEmail() != null) {
+            userRepository.findByEmail(client.getEmail())
+                    .ifPresent(u -> {
+                        if (clientRepository.findByUserId(u.getId()).isPresent()) {
+                            throw new DuplicateLoanException("A client profile is already registered for this user account.");
+                        }
+                        client.setUserId(u.getId());
+                    });
+        } else if (client.getUserId() != null && clientRepository.findByUserId(client.getUserId()).isPresent()) {
+            throw new DuplicateLoanException("A client profile is already registered for this user account.");
+        }
 
         if (request.getPlainAadhaar() != null && !request.getPlainAadhaar().isBlank()) {
             client.setAadhaarHash(hashSHA256(request.getPlainAadhaar()));
         }
 
         return clientRepository.save(client);
+    }
+
+    public Client getClientForCurrentUser(String email) {
+        if (email == null || email.isBlank()) {
+            throw new ResourceNotFoundException("User email not provided.");
+        }
+        String normalizedEmail = email.trim().toLowerCase();
+        // 1. Match by normalized email or raw email
+        return clientRepository.findByEmail(normalizedEmail)
+                .or(() -> clientRepository.findByEmail(email))
+                // 2. Match by linked User ID
+                .or(() -> userRepository.findByEmail(normalizedEmail).flatMap(u -> clientRepository.findByUserId(u.getId())))
+                .orElseThrow(() -> new ResourceNotFoundException("No client profile found for user: " + email + ". Please complete manual client registration."));
     }
 
     public Client getClientById(Long id) {

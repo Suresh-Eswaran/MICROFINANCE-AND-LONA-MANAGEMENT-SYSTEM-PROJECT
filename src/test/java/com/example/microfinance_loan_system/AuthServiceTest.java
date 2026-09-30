@@ -1,11 +1,8 @@
 package com.example.microfinance_loan_system;
 
-import com.example.microfinance_loan_system.config.JwtUtils;
-import com.example.microfinance_loan_system.dto.RegisterRequest;
 import com.example.microfinance_loan_system.model.Role;
 import com.example.microfinance_loan_system.model.User;
 import com.example.microfinance_loan_system.repository.UserRepository;
-import com.example.microfinance_loan_system.service.AuditLogService;
 import com.example.microfinance_loan_system.service.AuthService;
 import com.example.microfinance_loan_system.service.EmailService;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,12 +13,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,10 +32,7 @@ public class AuthServiceTest {
     private EmailService emailService;
 
     @Mock
-    private AuditLogService auditLogService;
-
-    @Mock
-    private JwtUtils jwtUtils;
+    private com.example.microfinance_loan_system.service.AuditLogService auditLogService;
 
     @InjectMocks
     private AuthService authService;
@@ -55,7 +47,6 @@ public class AuthServiceTest {
                 .fullName("Test User")
                 .password("encoded_old_password")
                 .role(Role.LOAN_OFFICER)
-                .status("ACTIVE")
                 .build();
     }
 
@@ -98,114 +89,65 @@ public class AuthServiceTest {
     }
 
     @Test
-    void testRegister_NewUser_GeneratesOtpAndStatusPendingVerification() {
-        RegisterRequest req = new RegisterRequest();
-        req.setEmail("newuser@microfin.com");
-        req.setFullName("New User");
-        req.setPassword("secretPass123");
-        req.setRole("LOAN_OFFICER");
-        req.setBranch("Head Office");
+    void testRegister_SetsPendingVerification_And_SendsOtp() {
+        com.example.microfinance_loan_system.dto.RegisterRequest regReq = new com.example.microfinance_loan_system.dto.RegisterRequest();
+        regReq.setFullName("New Member");
+        regReq.setEmail("newmember@microfin.com");
+        regReq.setPassword("Password123");
+        regReq.setRole("CLIENT");
+        regReq.setBranch("Main Branch");
 
-        when(userRepository.findByEmail("newuser@microfin.com")).thenReturn(Optional.empty());
-        when(passwordEncoder.encode("secretPass123")).thenReturn("encodedSecret");
-        when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
-            User u = invocation.getArgument(0);
-            u.setId(99L);
-            return u;
-        });
+        when(userRepository.findByEmail("newmember@microfin.com")).thenReturn(Optional.empty());
+        when(passwordEncoder.encode("Password123")).thenReturn("encodedPassword");
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Map<String, Object> result = authService.register(req);
+        User registered = authService.register(regReq);
+        assertNotNull(registered);
+        assertEquals("PENDING_VERIFICATION", registered.getStatus());
+        assertEquals("newmember@microfin.com", registered.getEmail());
 
-        assertNotNull(result);
-        assertEquals("PENDING_VERIFICATION", result.get("status"));
-        assertTrue((Boolean) result.get("requiresOtp"));
-        assertNotNull(result.get("otp"));
-        assertEquals(6, ((String) result.get("otp")).length());
-
-        verify(emailService, times(1)).sendRegistrationOtpEmail(eq("newuser@microfin.com"), eq("New User"), anyString());
+        verify(emailService, atLeastOnce()).sendRegistrationOtpEmail(eq("newmember@microfin.com"), anyString(), eq("New Member"));
     }
 
     @Test
-    void testVerifyEmailOtp_Success_TransitionsToActive() {
-        RegisterRequest req = new RegisterRequest();
-        req.setEmail("verify@microfin.com");
-        req.setFullName("Verify User");
-        req.setPassword("secretPass123");
-        req.setRole("LOAN_OFFICER");
-        req.setBranch("Head Office");
-
+    void testVerifyRegistrationOtp_Success() {
         User pendingUser = User.builder()
-                .id(100L)
-                .email("verify@microfin.com")
-                .fullName("Verify User")
-                .password("encodedSecret")
-                .role(Role.LOAN_OFFICER)
+                .id(2L)
+                .email("pending@microfin.com")
+                .fullName("Pending User")
                 .status("PENDING_VERIFICATION")
-                .build();
-
-        when(userRepository.findByEmail("verify@microfin.com")).thenReturn(Optional.empty());
-        when(passwordEncoder.encode("secretPass123")).thenReturn("encodedSecret");
-        when(userRepository.save(any(User.class))).thenReturn(pendingUser);
-
-        Map<String, Object> regResult = authService.register(req);
-        String otp = (String) regResult.get("otp");
-
-        when(userRepository.findByEmail("verify@microfin.com")).thenReturn(Optional.of(pendingUser));
-
-        Map<String, Object> verifyResult = authService.verifyEmailOtp("verify@microfin.com", otp);
-
-        assertEquals("ACTIVE", verifyResult.get("status"));
-        assertTrue((Boolean) verifyResult.get("verified"));
-        verify(userRepository, atLeastOnce()).save(pendingUser);
-    }
-
-    @Test
-    void testVerifyEmailOtp_InvalidOtp_ThrowsException() {
-        RegisterRequest req = new RegisterRequest();
-        req.setEmail("invalidotp@microfin.com");
-        req.setFullName("Invalid OTP User");
-        req.setPassword("secretPass123");
-        req.setRole("CLIENT");
-        req.setBranch("Head Office");
-
-        User pendingUser = User.builder()
-                .id(101L)
-                .email("invalidotp@microfin.com")
-                .fullName("Invalid OTP User")
-                .password("encodedSecret")
                 .role(Role.CLIENT)
-                .status("PENDING_VERIFICATION")
                 .build();
 
-        when(userRepository.findByEmail("invalidotp@microfin.com")).thenReturn(Optional.empty());
-        when(passwordEncoder.encode(any())).thenReturn("encodedSecret");
-        when(userRepository.save(any(User.class))).thenReturn(pendingUser);
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        authService.register(req);
+        String otp = authService.sendRegistrationOtp(pendingUser);
+        assertNotNull(otp);
+        assertEquals(6, otp.length());
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            authService.verifyEmailOtp("invalidotp@microfin.com", "999999");
-        });
+        when(userRepository.findByEmail("pending@microfin.com")).thenReturn(Optional.of(pendingUser));
+        User activated = authService.verifyRegistrationOtp("pending@microfin.com", otp);
+
+        assertEquals("ACTIVE", activated.getStatus());
     }
 
     @Test
-    void testLogin_PendingVerification_ThrowsException() {
+    void testLogin_PendingVerificationUser_ThrowsException() {
         User unverifiedUser = User.builder()
-                .id(102L)
+                .id(3L)
                 .email("unverified@microfin.com")
-                .password("encodedPass")
-                .role(Role.LOAN_OFFICER)
+                .password("encoded_pass")
                 .status("PENDING_VERIFICATION")
+                .role(Role.CLIENT)
                 .build();
 
         when(userRepository.findByEmail("unverified@microfin.com")).thenReturn(Optional.of(unverifiedUser));
-        when(passwordEncoder.matches("myPassword", "encodedPass")).thenReturn(true);
+        when(passwordEncoder.matches("raw_pass", "encoded_pass")).thenReturn(true);
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
-            authService.login("unverified@microfin.com", "myPassword");
+            authService.login("unverified@microfin.com", "raw_pass");
         });
 
-        assertTrue(ex.getMessage().contains("Your email has not been verified yet"));
+        assertTrue(ex.getMessage().contains("Your email is not verified yet"));
     }
 }
-

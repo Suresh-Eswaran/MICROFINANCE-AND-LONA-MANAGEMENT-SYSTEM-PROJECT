@@ -7,7 +7,13 @@ import com.example.microfinance_loan_system.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+
 @Service
 public class LoanService {
     @Autowired
@@ -20,6 +26,8 @@ public class LoanService {
     private EMIScheduleRepository emiScheduleRepository;
     @Autowired
     private CollectionRepository collectionRepository;
+    @Autowired
+    private ClientService clientService;
     public LoanApplication applyForLoan(LoanApplyRequest request) {
         Client client = clientRepository.findById(request.getClientId())
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -119,22 +127,63 @@ public class LoanService {
         return loanApplicationRepository.save(loan);
     }
 
-    @Transactional
-    public void deleteLoan(Long id) {
-        LoanApplication loan = getLoanById(id);
-
-        // Clean up EMI schedules and payments/collections
-        List<EMISchedule> schedules = emiScheduleRepository.findByLoanId(id);
-        for (EMISchedule sch : schedules) {
-            List<Collection> collections = collectionRepository.findAllByEmiId(sch.getId());
-            if (!collections.isEmpty()) {
-                collectionRepository.deleteAll(collections);
+    public List<LoanApplication> getLoansForCurrentUser(String email) {
+        try {
+            Client client = clientService.getClientForCurrentUser(email);
+            if (client == null) {
+                return Collections.emptyList();
             }
+            return loanApplicationRepository.findByClientId(client.getId());
+        } catch (ResourceNotFoundException e) {
+            return Collections.emptyList();
         }
-        if (!schedules.isEmpty()) {
-            emiScheduleRepository.deleteAll(schedules);
-        }
+    }
 
-        loanApplicationRepository.delete(loan);
+    public Map<String, Object> getLoanStatement(Long loanId) {
+        LoanApplication loan = getLoanById(loanId);
+        Client client = clientRepository.findById(loan.getClientId())
+                .orElseThrow(() -> new ResourceNotFoundException("Client not found for loan: " + loanId));
+
+        List<EMISchedule> schedules = emiScheduleRepository.findByLoanIdOrderByInstallmentNoAsc(loanId);
+
+        BigDecimal totalPrincipal = loan.getAmountRequested() != null ? loan.getAmountRequested() : BigDecimal.ZERO;
+        BigDecimal totalInterest = schedules.stream()
+                .map(s -> s.getInterest() != null ? s.getInterest() : BigDecimal.ZERO)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalRepayable = schedules.stream()
+                .map(s -> s.getEmiAmount() != null ? s.getEmiAmount() : BigDecimal.ZERO)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal paidAmount = schedules.stream()
+                .filter(s -> s.getStatus() == EmiStatus.PAID)
+                .map(s -> s.getEmiAmount() != null ? s.getEmiAmount() : BigDecimal.ZERO)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal outstandingBalance = totalRepayable.subtract(paidAmount).max(BigDecimal.ZERO);
+
+        long paidCount = schedules.stream().filter(s -> s.getStatus() == EmiStatus.PAID).count();
+        long overdueCount = schedules.stream().filter(s -> s.getStatus() == EmiStatus.OVERDUE).count();
+        long pendingCount = schedules.stream().filter(s -> s.getStatus() == EmiStatus.PENDING).count();
+
+        List<Long> emiIds = schedules.stream().map(EMISchedule::getId).toList();
+        List<Collection> collections = emiIds.isEmpty() ? Collections.emptyList() : collectionRepository.findAllByEmiIdIn(emiIds);
+
+        Map<String, Object> statement = new LinkedHashMap<>();
+        statement.put("loan", loan);
+        statement.put("client", client);
+        statement.put("schedules", schedules);
+        statement.put("collections", collections);
+        statement.put("totalPrincipal", totalPrincipal);
+        statement.put("totalInterest", totalInterest);
+        statement.put("totalRepayable", totalRepayable);
+        statement.put("paidAmount", paidAmount);
+        statement.put("outstandingBalance", outstandingBalance);
+        statement.put("paidCount", paidCount);
+        statement.put("overdueCount", overdueCount);
+        statement.put("pendingCount", pendingCount);
+        statement.put("generatedAt", LocalDateTime.now());
+
+        return statement;
     }
 }

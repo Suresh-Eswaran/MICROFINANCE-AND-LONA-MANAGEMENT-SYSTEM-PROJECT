@@ -3,7 +3,6 @@ package com.example.microfinance_loan_system.controller;
 import com.example.microfinance_loan_system.dto.ForgotPasswordRequest;
 import com.example.microfinance_loan_system.dto.LoginRequest;
 import com.example.microfinance_loan_system.dto.LoginResponse;
-import com.example.microfinance_loan_system.dto.OtpVerificationRequest;
 import com.example.microfinance_loan_system.dto.PasswordResetRequest;
 import com.example.microfinance_loan_system.dto.RegisterRequest;
 import com.example.microfinance_loan_system.dto.VerifyOtpRequest;
@@ -21,20 +20,9 @@ public class AuthController {
     @Autowired
     private AuthService authService;
     @PostMapping("/register")
-    public ResponseEntity<Map<String, Object>> register(@Valid @RequestBody RegisterRequest request) {
-        Map<String, Object> response = authService.register(request);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
-    }
-    @PostMapping("/verify-email-otp")
-    public ResponseEntity<Map<String, Object>> verifyEmailOtp(@RequestBody OtpVerificationRequest request) {
-        Map<String, Object> response = authService.verifyEmailOtp(request.getEmail(), request.getOtp());
-        return ResponseEntity.ok(response);
-    }
-    @PostMapping("/resend-email-otp")
-    public ResponseEntity<Map<String, Object>> resendEmailOtp(@RequestBody Map<String, String> request) {
-        String email = request.get("email");
-        Map<String, Object> response = authService.resendRegistrationOtp(email);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<User> register(@Valid @RequestBody RegisterRequest request) {
+        User registered = authService.register(request);
+        return new ResponseEntity<>(registered, HttpStatus.CREATED);
     }
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
@@ -49,10 +37,9 @@ public class AuthController {
     }
     @PostMapping("/forgot-password")
     public ResponseEntity<Map<String, String>> forgotPassword(@RequestBody ForgotPasswordRequest request) {
-        String otp = authService.forgotPassword(request.getEmail());
+        authService.forgotPassword(request.getEmail());
         return ResponseEntity.ok(Map.of(
-            "message", "Password reset OTP sent successfully to " + request.getEmail(),
-            "otp", otp
+            "message", "A 6-digit verification code has been dispatched to " + request.getEmail() + ". Please check your inbox and spam folder."
         ));
     }
     @PostMapping("/verify-otp")
@@ -63,6 +50,24 @@ public class AuthController {
             "valid", true,
             "email", request.getEmail(),
             "otp", request.getOtp()
+        ));
+    }
+    @PostMapping("/verify-registration-otp")
+    public ResponseEntity<Map<String, Object>> verifyRegistrationOtp(@Valid @RequestBody VerifyOtpRequest request) {
+        User verifiedUser = authService.verifyRegistrationOtp(request.getEmail(), request.getOtp());
+        return ResponseEntity.ok(Map.of(
+            "message", "Email verified successfully! Your account is now active.",
+            "valid", true,
+            "email", verifiedUser.getEmail(),
+            "status", verifiedUser.getStatus()
+        ));
+    }
+    @PostMapping("/resend-registration-otp")
+    public ResponseEntity<Map<String, String>> resendRegistrationOtp(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        authService.resendRegistrationOtp(email);
+        return ResponseEntity.ok(Map.of(
+            "message", "A new 6-digit verification code has been dispatched to " + email + ". Please check your inbox and spam folder."
         ));
     }
     @PostMapping("/reset-password")

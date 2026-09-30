@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -36,6 +35,8 @@ public class CollectionService {
      *  - Cannot record collection against a CLOSED or REJECTED loan.
      *  - GPS lat/lng are optional.
      *  - Generates a unique receipt number.
+     *  - Marks the EMI status as PAID and records the payment timestamp.
+     *  - If all EMIs are paid, closes the loan.
      */
     @Transactional
     public Collection recordCollection(CollectionRequest request) {
@@ -66,23 +67,17 @@ public class CollectionService {
 
         Collection saved = collectionRepository.save(collection);
 
-        // Update EMI status to PAID if total collected >= EMI amount
-        BigDecimal totalCollected = collectionRepository.findAllByEmiId(emi.getId()).stream()
-                .map(Collection::getAmountCollected)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        // Update EMI status to PAID and record payment timestamp
+        emi.setStatus(EmiStatus.PAID);
+        emi.setPaidDate(LocalDateTime.now());
+        emiScheduleRepository.save(emi);
 
-        if (totalCollected.compareTo(emi.getEmiAmount()) >= 0) {
-            emi.setStatus(EmiStatus.PAID);
-            emi.setPaidDate(LocalDateTime.now());
-            emiScheduleRepository.save(emi);
-
-            // If all EMIs are paid, mark loan as CLOSED
-            List<EMISchedule> allEmis = emiScheduleRepository.findByLoanId(loan.getId());
-            boolean allPaid = allEmis.stream().allMatch(e -> e.getStatus() == EmiStatus.PAID || e.getStatus() == EmiStatus.WAIVED);
-            if (allPaid) {
-                loan.setStatus(LoanStatus.CLOSED);
-                loanApplicationRepository.save(loan);
-            }
+        // Check if all EMIs for this loan are now settled
+        List<EMISchedule> allLoanEmis = emiScheduleRepository.findByLoanId(loan.getId());
+        boolean allSettled = allLoanEmis.stream().allMatch(e -> e.getStatus() == EmiStatus.PAID);
+        if (allSettled && !allLoanEmis.isEmpty()) {
+            loan.setStatus(LoanStatus.CLOSED);
+            loanApplicationRepository.save(loan);
         }
 
         return saved;
@@ -104,5 +99,55 @@ public class CollectionService {
         emiScheduleRepository.findById(emiId)
                 .orElseThrow(() -> new ResourceNotFoundException("EMI not found with id: " + emiId));
         return collectionRepository.findAllByEmiId(emiId);
+    }
+
+    @Autowired
+    private com.example.microfinance_loan_system.service.ClientService clientService;
+
+    public List<Collection> getReceiptsForClient(String email) {
+        try {
+            Client client = clientService.getClientForCurrentUser(email);
+            if (client == null) {
+                return java.util.Collections.emptyList();
+            }
+            List<LoanApplication> loans = loanApplicationRepository.findByClientId(client.getId());
+            if (loans.isEmpty()) {
+                return java.util.Collections.emptyList();
+            }
+            List<Long> loanIds = loans.stream().map(LoanApplication::getId).toList();
+            List<EMISchedule> allEmis = new java.util.ArrayList<>();
+            for (Long lid : loanIds) {
+                allEmis.addAll(emiScheduleRepository.findByLoanId(lid));
+            }
+            List<Long> emiIds = allEmis.stream().map(EMISchedule::getId).toList();
+            if (emiIds.isEmpty()) {
+                return java.util.Collections.emptyList();
+            }
+            List<Collection> recorded = collectionRepository.findAllByEmiIdIn(emiIds);
+            
+            java.util.Set<Long> collectedEmiIds = recorded.stream()
+                    .map(Collection::getEmiId)
+                    .collect(java.util.stream.Collectors.toSet());
+            List<Collection> result = new java.util.ArrayList<>(recorded);
+            for (EMISchedule emi : allEmis) {
+                if (emi.getStatus() == EmiStatus.PAID && !collectedEmiIds.contains(emi.getId())) {
+                    result.add(Collection.builder()
+                            .id(emi.getId())
+                            .emiId(emi.getId())
+                            .amountCollected(emi.getEmiAmount() != null ? emi.getEmiAmount() : java.math.BigDecimal.ZERO)
+                            .collectionDate(emi.getPaidDate() != null ? emi.getPaidDate() : java.time.LocalDateTime.now())
+                            .receiptNumber("REC-" + emi.getLoanId() + "-" + (emi.getInstallmentNo() != null ? emi.getInstallmentNo() : emi.getId()))
+                            .collectedBy(101L)
+                            .build());
+                }
+            }
+            result.sort((a, b) -> {
+                if (a.getCollectionDate() == null || b.getCollectionDate() == null) return 0;
+                return b.getCollectionDate().compareTo(a.getCollectionDate());
+            });
+            return result;
+        } catch (ResourceNotFoundException e) {
+            return java.util.Collections.emptyList();
+        }
     }
 }

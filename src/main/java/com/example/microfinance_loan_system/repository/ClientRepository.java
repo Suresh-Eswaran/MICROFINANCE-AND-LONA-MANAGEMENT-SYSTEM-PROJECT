@@ -14,4 +14,6 @@ public interface ClientRepository extends JpaRepository<Client,Long> {
     Optional<Client> findByPhoneNumber(String phoneNumber);
     List<Client> findByGroupId(Long groupId);
     List<Client> findByKycStatusNot(com.example.microfinance_loan_system.model.KycStatus kycStatus);
+    Optional<Client> findByUserId(Long userId);
+    Optional<Client> findByEmail(String email);
 }
